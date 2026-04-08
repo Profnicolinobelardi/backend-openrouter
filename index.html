@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Griglia Personalizzata AI</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #fff3e0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+h2 { color: #e65100; }
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #f57c00;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#risultato {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff8e1;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>📊 Generatore Griglia Personalizzata</h2>
+
+    <label>Profilo studente:</label>
+    <textarea id="profilo" rows="4"></textarea>
+
+    <label>Griglia originale:</label>
+    <textarea id="griglia" rows="6"></textarea>
+
+    <button onclick="genera()">Genera Griglia ✨</button>
+
+    <div id="risultato"></div>
+</div>
+
+<script>
+async function genera() {
+    const profilo = document.getElementById("profilo").value;
+    const griglia = document.getElementById("griglia").value;
+    const risultato = document.getElementById("risultato");
+
+    if (!profilo || !griglia) {
+        alert("Compila tutto!");
+        return;
+    }
+
+    risultato.style.display = "block";
+    risultato.innerHTML = "⏳ Elaborazione...";
+
+    try {
+        const res = await fetch("https://backend-openrouter.onrender.com/api", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ profilo, griglia })
+        });
+
+        const data = await res.json();
+
+        risultato.innerHTML = data.risultato;
+
+    } catch (err) {
+        risultato.innerHTML = "❌ Errore: " + err.message;
+    }
+}
+</script>
+
+</body>
+</html>
