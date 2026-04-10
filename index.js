@@ -8,7 +8,7 @@ app.use(express.json());
 app.post("/api", async (req, res) => {
   const { griglia, profilo } = req.body;
 
-  const prompt = `
+    const prompt = `
   Sei un insegnante esperto.
 
   Adatta la griglia di valutazione al profilo.
@@ -17,6 +17,7 @@ app.post("/api", async (req, res) => {
   - Mantieni la struttura
   - Semplifica linguaggio
   - Rispondi SOLO in HTML
+  - Non includere formattazione Markdown, soltanto HTML!
 
   GRIGLIA:
   ${griglia}
@@ -32,13 +33,23 @@ app.post("/api", async (req, res) => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "openai/gpt-4.1",
-      messages: [{ role: "user", content: prompt }]
+      model: "openai/gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 4000
     })
   });
 
   const data = await response.json();
-  const text = data.choices?.[0]?.message?.content || "Errore";
+
+if (!response.ok) {
+  console.error("Errore API:", data);
+  throw new Error(data.error?.message || "Richiesta fallita");
+}
+console.log(JSON.stringify(data, null, 2));
+const text =
+  data?.choices?.[0]?.message?.content ??
+  data?.choices?.[0]?.text ??
+  "Errore";
 
   res.json({ risultato: text });
 });
